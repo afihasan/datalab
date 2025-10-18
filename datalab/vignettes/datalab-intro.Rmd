@@ -1,0 +1,226 @@
+---
+title: "Getting Started with datalab"
+author: "lut hasan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with datalab}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+library(datalab)
+```
+
+# Introduction
+
+Welcome to `datalab`! This package helps you explore and visualize data without worrying about complex coding. You can create beautiful charts and compute statistics with simple, easy-to-remember functions.
+
+## Quick Start
+
+### Step 1: Load Your Data
+
+First, load your data and call it `data`:
+
+```{r}
+# Load the sample agriculture dataset
+data(agriculture_data)
+data <- agriculture_data
+```
+
+### Step 2: Explore Your Variables
+
+See what's in your data:
+
+```{r}
+head(data)
+```
+
+### Step 3: Create Your First Chart
+
+Make a line chart to see the relationship between two variables:
+
+```{r}
+linechart(nitrogen_content, crop_yield)
+```
+
+## More Examples
+
+### Boxplots
+
+Show the distribution of a single variable:
+
+```{r}
+# Load heart disease data
+data(heart_data)
+data <- heart_data
+
+boxplot(age)
+```
+
+Compare groups:
+
+```{r}
+boxplot(age, group = 'sex')
+```
+
+### Pie Charts
+
+Show how categories are distributed:
+
+```{r}
+piechart(chest_pain_type)
+```
+
+Split by another variable to compare:
+
+```{r}
+piechart(chest_pain_type, 'sex')
+```
+
+### Descriptive Statistics
+
+Get a summary of your variables:
+
+```{r}
+descriptives(age, resting_bp, cholesterol)
+```
+
+### Frequency Tables
+
+Count how many times each value appears:
+
+```{r}
+frequencies(chest_pain_type)
+```
+
+## Tips for Workshop Participants
+
+### Using Variables
+
+You can assign variables to letters to make typing easier:
+
+```{r eval=FALSE}
+x = nitrogen_content
+y = crop_yield
+linechart(x, y)
+```
+
+### Changing Variables
+
+Want to look at different variables? Just reassign:
+
+```{r eval=FALSE}
+a = chest_pain_type
+b = age
+piechart(a, b)
+```
+
+### Working with Your Own Data
+
+To use your own data:
+
+1. Load your data file (CSV or Excel)
+2. Assign it to `data`
+3. Use the functions as shown above
+
+```{r eval=FALSE}
+# For CSV files
+data <- read.csv("myfile.csv")
+
+# For Excel files (requires readxl package)
+library(readxl)
+data <- read_excel("myfile.xlsx")
+```
+
+## Common Problems and Solutions
+
+### "Variable not found" error
+
+**Problem:** You see an error like `Variable 'age' not found in data`
+
+**Solution:** Check that:
+- You spelled the variable name correctly
+- You loaded the data and called it `data`
+- The variable exists in your dataset
+
+### "No data frame found" error
+
+**Problem:** You see `No data frame found`
+
+**Solution:** Make sure you loaded your data and assigned it to `data`:
+
+```{r eval=FALSE}
+data <- my_dataset
+```
+
+### Charts look cluttered
+
+**Problem:** Too many categories in a pie chart
+
+**Solution:** Use a frequency table first to see your data:
+
+```{r}
+frequencies(chest_pain_type)
+```
+
+## One-Slide Demo Script (for Facilitators)
+
+**Goal:** Show participants how to go from data to insight in 5 minutes
+
+1. **Load data** (30 seconds)
+   ```{r eval=FALSE}
+   data(heart_data)
+   data <- heart_data
+   ```
+
+2. **Look at data** (30 seconds)
+   ```{r eval=FALSE}
+   head(data)
+   ```
+
+3. **Make a chart** (1 minute)
+   ```{r eval=FALSE}
+   piechart(chest_pain_type)
+   ```
+
+4. **Compare groups** (1 minute)
+   ```{r eval=FALSE}
+   piechart(chest_pain_type, sex)
+   ```
+
+5. **Get statistics** (1 minute)
+   ```{r eval=FALSE}
+   descriptives(age, resting_bp)
+   ```
+
+6. **Discuss insight** (1.5 minutes): "What story does this data tell?"
+
+## Next Steps
+
+Try these exercises on your own:
+
+**Exercise 1:** Create a boxplot comparing cholesterol levels between males and females.
+
+**Exercise 2:** Make a frequency table of chest pain types, sorted from most to least common.
+
+**Exercise 3:** Create a line chart showing the relationship between age and resting blood pressure.
+
+---
+
+## Reference: All Available Functions
+
+- `linechart(x, y)` - Line chart
+- `boxplot(var)` - Boxplot  
+- `piechart(var, filter)` - Pie chart(s)
+- `descriptives(...)` - Summary statistics
+- `frequencies(var)` - Frequency table
+
+For help with any function, type `?function_name` (e.g., `?linechart`)

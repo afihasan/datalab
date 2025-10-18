@@ -1,0 +1,27 @@
+Package: datalab
+Type: Package
+Title: Simple Data Analysis for Complete Beginners
+Version: 0.1.0
+Authors@R: c(
+    person("Workshop", "Facilitator", email = "facilitator@example.com", role = c("aut", "cre"))
+    )
+Description: A beginner-friendly package for data visualization and descriptive 
+    statistics. Designed for workshop participants with no prior R experience.
+    All functions accept bare variable names and produce publication-ready output
+    with sensible defaults.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.3
+Imports:
+    ggplot2 (>= 3.3.0),
+    dplyr (>= 1.0.0),
+    rlang (>= 0.4.0),
+    scales (>= 1.1.0),
+    patchwork (>= 1.1.0)
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Depends: R (>= 3.6.0)
