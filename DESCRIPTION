@@ -1,7 +1,8 @@
 Package: datalab
 Type: Package
 Title: Simple Data Analysis for Complete Beginners
-Version: 0.1.0
+Version: 0.1.1
+Date: 2025-10-19
 Authors@R: c(
     person("Workshop", "Facilitator", email = "facilitator@example.com", role = c("aut", "cre"))
     )
@@ -22,6 +23,7 @@ Imports:
 Suggests:
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    pkgload
 VignetteBuilder: knitr
 Depends: R (>= 3.6.0)

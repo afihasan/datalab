@@ -71,6 +71,60 @@ Compare groups:
 boxplot(age, group = 'sex')
 ```
 
+### Histograms
+
+See how your data is distributed:
+
+```{r}
+histogram(age)
+```
+
+Change the number of bins:
+
+```{r}
+histogram(age, bins = 20)
+```
+
+Add a density curve:
+
+```{r}
+histogram(cholesterol, bins = 25, show_density = TRUE)
+```
+
+### Scatter Plots
+
+Explore relationships between two variables:
+
+```{r}
+scatterplot(age, resting_bp)
+```
+
+Add a trend line:
+
+```{r}
+scatterplot(age, cholesterol, trend_line = TRUE)
+```
+
+Color by groups:
+
+```{r}
+scatterplot(age, cholesterol, color = 'sex')
+```
+
+### Bar Charts
+
+Compare categories:
+
+```{r}
+barchart(chest_pain_type)
+```
+
+Compare categories across groups:
+
+```{r}
+barchart(chest_pain_type, group = 'sex')
+```
+
 ### Pie Charts
 
 Show how categories are distributed:
@@ -99,6 +153,30 @@ Count how many times each value appears:
 
 ```{r}
 frequencies(chest_pain_type)
+```
+
+### Compare Two Groups
+
+Test if there's a significant difference between groups:
+
+```{r}
+compare_groups(age, sex)
+```
+
+```{r}
+compare_groups(cholesterol, sex)
+```
+
+### Correlation Analysis
+
+See if two variables are related:
+
+```{r}
+correlate(age, resting_bp)
+```
+
+```{r}
+correlate(age, cholesterol)
 ```
 
 ## Tips for Workshop Participants
@@ -171,6 +249,20 @@ data <- my_dataset
 frequencies(chest_pain_type)
 ```
 
+Or use a bar chart instead:
+
+```{r}
+barchart(chest_pain_type)
+```
+
+### Understanding p-values
+
+**Problem:** Not sure what the results mean
+
+**Solution:**
+- **p < 0.05** with ✓ = There IS a significant difference/relationship
+- **p >= 0.05** with ✗ = There is NO significant difference/relationship
+
 ## One-Slide Demo Script (for Facilitators)
 
 **Goal:** Show participants how to go from data to insight in 5 minutes
@@ -188,17 +280,17 @@ frequencies(chest_pain_type)
 
 3. **Make a chart** (1 minute)
    ```{r eval=FALSE}
-   piechart(chest_pain_type)
+   histogram(age, show_density = TRUE)
    ```
 
 4. **Compare groups** (1 minute)
    ```{r eval=FALSE}
-   piechart(chest_pain_type, sex)
+   boxplot(cholesterol, group = sex)
    ```
 
-5. **Get statistics** (1 minute)
+5. **Test difference** (1 minute)
    ```{r eval=FALSE}
-   descriptives(age, resting_bp)
+   compare_groups(cholesterol, sex)
    ```
 
 6. **Discuss insight** (1.5 minutes): "What story does this data tell?"
@@ -213,14 +305,57 @@ Try these exercises on your own:
 
 **Exercise 3:** Create a line chart showing the relationship between age and resting blood pressure.
 
+**Exercise 4:** Make a scatter plot of age vs cholesterol with a trend line. What does it show?
+
+**Exercise 5:** Use `compare_groups()` to test if males and females have different average ages.
+
 ---
 
 ## Reference: All Available Functions
 
+### Visualization Functions
 - `linechart(x, y)` - Line chart
-- `boxplot(var)` - Boxplot  
+- `boxplot(var, group)` - Boxplot  
+- `histogram(var, bins)` - Histogram
+- `scatterplot(x, y, color, trend_line)` - Scatter plot
+- `barchart(var, group)` - Bar chart
 - `piechart(var, filter)` - Pie chart(s)
+
+### Statistical Functions
 - `descriptives(...)` - Summary statistics
 - `frequencies(var)` - Frequency table
+- `compare_groups(var, group)` - T-test comparing two groups
+- `correlate(x, y)` - Correlation between two variables
+
+### Common Parameters
+- `data` - Your dataset (optional if named `data`)
+- `title` - Custom chart title
+- `group` / `color` / `filter` - Split data by categories
+- `trend_line` / `smooth` - Add trend lines
+- `bins` - Number of bins in histograms
+- `show_density` - Add density curve to histograms
 
 For help with any function, type `?function_name` (e.g., `?linechart`)
+
+## Choosing the Right Chart
+
+**For one continuous variable:**
+- Use `histogram()` to see the shape of distribution
+- Use `boxplot()` to see median and outliers
+
+**For one categorical variable:**
+- Use `barchart()` for comparing categories (2-10 categories)
+- Use `piechart()` for showing proportions (2-5 categories)
+- Use `frequencies()` for exact counts
+
+**For two continuous variables:**
+- Use `scatterplot()` to see patterns and relationships
+- Use `linechart()` when one variable represents time
+
+**For continuous + categorical:**
+- Use `boxplot(var, group = ...)` to compare distributions
+- Use `scatterplot(x, y, color = ...)` to see patterns by group
+
+**For testing differences:**
+- Use `compare_groups()` to test if two groups are different
+- Use `correlate()` to measure relationship strength

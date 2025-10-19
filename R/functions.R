@@ -330,3 +330,275 @@ frequencies <- function(var, data = NULL, percent = TRUE, sort = "desc") {
   print(freq_table)
   invisible(freq_table)
 }
+
+#' Create a histogram
+#'
+#' @param var Variable to plot (bare name)
+#' @param data Optional data frame
+#' @param bins Number of bins (default: 30)
+#' @param title Chart title
+#' @param x_label X-axis label
+#' @param show_density Show density curve overlay (default: FALSE)
+#' @return A ggplot object
+#' @export
+#' @examples
+#' \dontrun{
+#' mydata <- data.frame(values = rnorm(100))
+#' histogram(values)
+#' histogram(values, bins = 20, show_density = TRUE)
+#' }
+histogram <- function(var, data = NULL, bins = 30, title = NULL, 
+                      x_label = NULL, show_density = FALSE) {
+  var_name <- rlang::as_name(rlang::ensym(var))
+  var_vals <- resolve_var(!!rlang::ensym(var), data)
+  
+  if (is.null(x_label)) x_label <- var_name
+  if (is.null(title)) title <- paste("Histogram of", var_name)
+  
+  plot_data <- data.frame(var = var_vals)
+  
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = var)) +
+    ggplot2::geom_histogram(bins = bins, fill = "#6A4C93", color = "white", 
+                            alpha = 0.8, linewidth = 0.5) +
+    ggplot2::labs(title = title, x = x_label, y = "Count") +
+    ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(face = "bold", hjust = 0.5),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+  
+  if (show_density) {
+    p <- p + ggplot2::geom_density(ggplot2::aes(y = ggplot2::after_stat(count) * 
+                                                  (max(var_vals, na.rm = TRUE) - min(var_vals, na.rm = TRUE)) / bins),
+                                   color = "#F72585", linewidth = 1.2)
+  }
+  
+  print(p)
+  invisible(p)
+}
+
+#' Create a scatter plot
+#'
+#' @param x Variable for x-axis (bare name)
+#' @param y Variable for y-axis (bare name)
+#' @param data Optional data frame
+#' @param title Chart title
+#' @param x_label X-axis label
+#' @param y_label Y-axis label
+#' @param color Optional color variable (bare name)
+#' @param size Point size (default: 3)
+#' @param trend_line Add trend line (default: FALSE)
+#' @return A ggplot object
+#' @export
+#' @examples
+#' \dontrun{
+#' mydata <- data.frame(x = rnorm(100), y = rnorm(100))
+#' scatterplot(x, y)
+#' scatterplot(x, y, trend_line = TRUE)
+#' }
+scatterplot <- function(x, y, data = NULL, title = NULL, x_label = NULL, 
+                        y_label = NULL, color = NULL, size = 3, trend_line = FALSE) {
+  x_name <- rlang::as_name(rlang::ensym(x))
+  y_name <- rlang::as_name(rlang::ensym(y))
+  
+  x_vals <- resolve_var(!!rlang::ensym(x), data)
+  y_vals <- resolve_var(!!rlang::ensym(y), data)
+  
+  if (is.null(x_label)) x_label <- x_name
+  if (is.null(y_label)) y_label <- y_name
+  if (is.null(title)) title <- paste(y_name, "vs", x_name)
+  
+  plot_data <- data.frame(x = x_vals, y = y_vals)
+  
+  if (!is.null(color)) {
+    color_name <- rlang::as_name(rlang::ensym(color))
+    color_vals <- resolve_var(!!rlang::ensym(color), data)
+    plot_data$color <- as.factor(color_vals)
+    
+    p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = y, color = color)) +
+      ggplot2::geom_point(size = size, alpha = 0.7) +
+      ggplot2::scale_color_brewer(palette = "Set1", name = color_name)
+  } else {
+    p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_point(color = "#4361EE", size = size, alpha = 0.7)
+  }
+  
+  p <- p +
+    ggplot2::labs(title = title, x = x_label, y = y_label) +
+    ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(face = "bold", hjust = 0.5),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+  
+  if (trend_line) {
+    p <- p + ggplot2::geom_smooth(method = "lm", se = TRUE, alpha = 0.2, 
+                                  color = "#F72585", linewidth = 1)
+  }
+  
+  print(p)
+  invisible(p)
+}
+
+#' Create a bar chart
+#'
+#' @param var Variable to plot (bare name)
+#' @param data Optional data frame
+#' @param group Optional grouping variable for stacked/grouped bars (bare name)
+#' @param title Chart title
+#' @param x_label X-axis label
+#' @param y_label Y-axis label (default: "Count")
+#' @param position Bar position: "stack", "dodge", or "fill" (default: "dodge")
+#' @return A ggplot object
+#' @export
+#' @examples
+#' \dontrun{
+#' mydata <- data.frame(category = sample(c("A","B","C"), 100, replace = TRUE))
+#' barchart(category)
+#' }
+barchart <- function(var, data = NULL, group = NULL, title = NULL, 
+                     x_label = NULL, y_label = "Count", position = "dodge") {
+  var_name <- rlang::as_name(rlang::ensym(var))
+  var_vals <- resolve_var(!!rlang::ensym(var), data)
+  
+  if (is.null(x_label)) x_label <- var_name
+  if (is.null(title)) title <- paste("Bar Chart of", var_name)
+  
+  if (!is.null(group)) {
+    group_name <- rlang::as_name(rlang::ensym(group))
+    group_vals <- resolve_var(!!rlang::ensym(group), data)
+    plot_data <- data.frame(var = as.factor(var_vals), group = as.factor(group_vals))
+    
+    p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = var, fill = group)) +
+      ggplot2::geom_bar(position = position, alpha = 0.8) +
+      ggplot2::scale_fill_brewer(palette = "Set2", name = group_name)
+  } else {
+    plot_data <- data.frame(var = as.factor(var_vals))
+    
+    p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = var)) +
+      ggplot2::geom_bar(fill = "#FF6B6B", alpha = 0.8)
+  }
+  
+  p <- p +
+    ggplot2::labs(title = title, x = x_label, y = y_label) +
+    ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(face = "bold", hjust = 0.5),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+  
+  print(p)
+  invisible(p)
+}
+
+#' Compare two groups with t-test
+#'
+#' @param var Variable to test (bare name)
+#' @param group Grouping variable (bare name)
+#' @param data Optional data frame
+#' @return Invisible t-test results with printed summary
+#' @export
+#' @examples
+#' \dontrun{
+#' mydata <- data.frame(score = rnorm(100), group = rep(c("A","B"), 50))
+#' compare_groups(score, group)
+#' }
+compare_groups <- function(var, group, data = NULL) {
+  var_name <- rlang::as_name(rlang::ensym(var))
+  group_name <- rlang::as_name(rlang::ensym(group))
+  
+  var_vals <- resolve_var(!!rlang::ensym(var), data)
+  group_vals <- resolve_var(!!rlang::ensym(group), data)
+  
+  group_levels <- unique(group_vals)
+  
+  if (length(group_levels) != 2) {
+    stop("Group variable must have exactly 2 levels for t-test. Found: ", 
+         length(group_levels), call. = FALSE)
+  }
+  
+  group1_vals <- var_vals[group_vals == group_levels[1]]
+  group2_vals <- var_vals[group_vals == group_levels[2]]
+  
+  test_result <- t.test(group1_vals, group2_vals)
+  
+  cat("\nTwo-Sample t-test\n")
+  cat("=================\n\n")
+  cat("Variable:", var_name, "\n")
+  cat("Groups:", group_name, "\n\n")
+  cat(sprintf("Group '%s': Mean = %.2f (SD = %.2f, n = %d)\n", 
+              group_levels[1], mean(group1_vals, na.rm = TRUE), 
+              sd(group1_vals, na.rm = TRUE), sum(!is.na(group1_vals))))
+  cat(sprintf("Group '%s': Mean = %.2f (SD = %.2f, n = %d)\n", 
+              group_levels[2], mean(group2_vals, na.rm = TRUE), 
+              sd(group2_vals, na.rm = TRUE), sum(!is.na(group2_vals))))
+  cat(sprintf("\nDifference: %.2f\n", test_result$estimate[1] - test_result$estimate[2]))
+  cat(sprintf("t-statistic: %.3f\n", test_result$statistic))
+  cat(sprintf("p-value: %.4f\n", test_result$p.value))
+  cat(sprintf("95%% CI: [%.2f, %.2f]\n", test_result$conf.int[1], test_result$conf.int[2]))
+  
+  if (test_result$p.value < 0.05) {
+    cat("\n✓ Result: Statistically significant difference (p < 0.05)\n")
+  } else {
+    cat("\n✗ Result: No significant difference (p >= 0.05)\n")
+  }
+  
+  invisible(test_result)
+}
+
+#' Calculate correlation between two variables
+#'
+#' @param x First variable (bare name)
+#' @param y Second variable (bare name)
+#' @param data Optional data frame
+#' @param method Correlation method: "pearson", "spearman", or "kendall" (default: "pearson")
+#' @return Invisible correlation test results with printed summary
+#' @export
+#' @examples
+#' \dontrun{
+#' mydata <- data.frame(x = rnorm(100), y = rnorm(100))
+#' correlate(x, y)
+#' }
+correlate <- function(x, y, data = NULL, method = "pearson") {
+  x_name <- rlang::as_name(rlang::ensym(x))
+  y_name <- rlang::as_name(rlang::ensym(y))
+  
+  x_vals <- resolve_var(!!rlang::ensym(x), data)
+  y_vals <- resolve_var(!!rlang::ensym(y), data)
+  
+  test_result <- cor.test(x_vals, y_vals, method = method)
+  
+  cat("\nCorrelation Analysis\n")
+  cat("====================\n\n")
+  cat("Variables:", x_name, "and", y_name, "\n")
+  cat("Method:", tools::toTitleCase(method), "\n\n")
+  cat(sprintf("Correlation: %.3f\n", test_result$estimate))
+  cat(sprintf("p-value: %.4f\n", test_result$p.value))
+  
+  if (method == "pearson") {
+    cat(sprintf("95%% CI: [%.3f, %.3f]\n", test_result$conf.int[1], test_result$conf.int[2]))
+  }
+  
+  # Interpretation
+  abs_r <- abs(test_result$estimate)
+  if (abs_r < 0.3) {
+    strength <- "weak"
+  } else if (abs_r < 0.7) {
+    strength <- "moderate"
+  } else {
+    strength <- "strong"
+  }
+  
+  direction <- ifelse(test_result$estimate > 0, "positive", "negative")
+  
+  cat(sprintf("\nInterpretation: %s %s correlation\n", 
+              tools::toTitleCase(strength), direction))
+  
+  if (test_result$p.value < 0.05) {
+    cat("✓ Statistically significant (p < 0.05)\n")
+  } else {
+    cat("✗ Not statistically significant (p >= 0.05)\n")
+  }
+  
+  invisible(test_result)
+}
